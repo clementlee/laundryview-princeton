@@ -15,6 +15,8 @@ import json
 
 with open('rooms.json') as datafile:
     rooms = json.load(datafile)
+with open('roomdata.json') as datafile:
+    roomdata = json.load(datafile)
 
 room = ('', -1)
 for k in rooms:
@@ -34,7 +36,7 @@ url = 'https://laundryview.com/dynamicRoomData.php?location='+str(room[1])
 raw = urllib2.urlopen(url).read()
 
 raw = raw[1:]
-statuses = raw.split('&')[2:]
+statuses = raw.split('&')#[2:]
 l = [a.strip().split('\n') for a in statuses]
 flat = [item for sublist in l for item in sublist]
 
@@ -45,5 +47,26 @@ def parse(text):
     array = text.split(':')
     return array
 q = map(parse, flat)
+q = filter(lambda x: len(x) == 10, q)
+
+#for i in q:
+#    print i
+
+w = 0
+wa = 0
+d = 0
+da = 0
+#print roomdata
 for i in q:
-    print i
+    if i[3] in roomdata[str(room[1])] and i[2] != '1':
+        if roomdata[str(room[1])][i[3]] == True:
+            w += 1
+            if i[0] == '1':
+                wa += 1
+        else:
+            d += 1
+            if i[0] == '1':
+                da += 1
+
+print "%d of %d washers available" % (wa, w)
+print "%d of %d dryers available" % (da, d)
